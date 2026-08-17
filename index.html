@@ -206,7 +206,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-
 <body>
 <div class="hdr">
   <div>
-    <div class="hdr-eyebrow">Fred Fitness · EGYM · v3.0</div>
+    <div class="hdr-eyebrow">Fred Fitness · EGYM · <span id="verTag">v4.0</span></div>
     <div class="hdr-title">Training Console</div>
   </div>
   <div class="sync" onclick="app.tab('data')" role="button" tabindex="0">
@@ -224,10 +224,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-
 <script>
 "use strict";
 // ============================================================
-// EGYM TRAINING CONSOLE v3.0
+// EGYM TRAINING CONSOLE v4.0
 // Goal: aesthetic hypertrophy on the Fred Fitness EGYM floor.
 // Units: pounds.
 // ============================================================
+const APP_VERSION = "4.1";
+const APP_BUILT = "2026-08-16";   // bump both whenever index.html changes
 const KEY = "egym-console-v1";
 const TOKEN_KEY = "egym-console-token";
 const ROUND_LB = 5, HOUR = 3600000;
@@ -500,15 +502,30 @@ function eccWeight(s, item, dayId, concW, mod){
   return {w:w, followed:false, pct:w/e1};
 }
 
+// A machine is the same machine whatever day you meet it on, so history is pooled
+// across days. What differs is the rep range: Monday chest press is 4x6-10 and
+// Thursday is 3x8-12, so a weight carried over is translated between the two via
+// the e1RM the sets imply, rather than copied across raw.
 function perfHistory(s, mId, dayId, limit){
   const out=[];
   for(let i=s.sessions.length-1;i>=0&&out.length<(limit||2);i--){
     const ss=s.sessions[i];
-    if(ss.day!==dayId) continue;
     const e=ss.entries.find(x=>x.m===mId);
-    if(e&&e.sets.length) out.push({ss,e});
+    if(e&&e.sets.length) out.push({ss,e,sameDay:ss.day===dayId});
   }
   return out;
+}
+// Rep ranges differ between days, so the load that belongs at one range is not the
+// load that belongs at another. Scale by the ratio of the two target percentages.
+function itemFor(dayId, mId){
+  const day=PROGRAM[dayId]; if(!day) return null;
+  return day.items.find(i=>i.m===mId)||null;
+}
+function crossDayScale(fromDayId, toItem, mId){
+  const from=itemFor(fromDayId,mId);
+  if(!from||!toItem||from.adaptive||toItem.adaptive) return 1;
+  if(!(from.pct>0)||!(toItem.pct>0)) return 1;
+  return toItem.pct/from.pct;
 }
 // Next weight builds on the weight actually lifted last time, adjusted by how it went.
 function prescribe(s, item, dayId, opts){
@@ -516,18 +533,20 @@ function prescribe(s, item, dayId, opts){
   const intensity=s.settings.intensity||INTENSITY_DEFAULT;
   const roll=rollingE1RM(s,item.m);
   const hist=perfHistory(s,item.m,dayId,2);
-  let base, adj=1, why, seeded=false, lastTxt=null, lastW=null, step=0, lastReps=null;
+  let base, adj=1, why, seeded=false, lastTxt=null, lastW=null, step=0, lastReps=null, crossNote=null;
   if(!hist.length){
     base=roll.v*item.pct; seeded=true;
     why=roll.seeded?"starting point from your EGYM value":"starting point from your rolling e1RM";
   } else {
     const cur=hist[0];
     lastW=Math.max(...cur.e.sets.map(x=>x.w));
-    base=lastW/sessionMod(cur.ss);
-    const g=gradeEntry(cur.e,item);
+    const scale=cur.sameDay?1:crossDayScale(cur.ss.day,item,item.m);
+    base=(lastW*scale)/sessionMod(cur.ss);
+    const g=gradeEntry(cur.e, cur.sameDay?item:(itemFor(cur.ss.day,item.m)||item));
     adj=g.adj; why=g.why; step=g.step||0;
     if(hist[1]){
-      const g2=gradeEntry(hist[1].e,item);
+      const h2=hist[1];
+      const g2=gradeEntry(h2.e, h2.sameDay?item:(itemFor(h2.ss.day,item.m)||item));
       if(g2){
         // Only genuinely strong sessions compound. Now that most sessions earn something,
         // a bonus on any two rises in a row would just be a blanket multiplier.
@@ -538,8 +557,12 @@ function prescribe(s, item, dayId, opts){
     adj=Math.max(0.90,Math.min(1.12,adj));
     base*=adj;
     const r=cur.e.sets.map(x=>x.reps);
-    lastTxt=cur.e.sets.length+"x"+Math.min(...r)+"-"+Math.max(...r)+" @ "+lastW+" lb";
+    const fromDay=PROGRAM[cur.ss.day];
+    lastTxt=cur.e.sets.length+"x"+Math.min(...r)+"-"+Math.max(...r)+" @ "+lastW+" lb"+
+      (cur.sameDay?"":" ("+(fromDay?fromDay.dow:cur.ss.day)+")");
     lastReps=Math.min(...r);
+    if(!cur.sameDay && Math.abs(scale-1)>0.01)
+      crossNote="carried over from "+(fromDay?fromDay.dow:cur.ss.day)+" and adjusted for this rep range";
   }
   const anchor=roll.v*item.pct;
   const railLo=anchor*0.70, railHi=anchor*1.45;
@@ -557,8 +580,8 @@ function prescribe(s, item, dayId, opts){
   // The prescribed weight is shaped by more than the grade: the intensity setting, the
   // e1RM rails and 5 lb rounding all land after it. Say so, rather than reporting the
   // grade as if it were the change.
-  let note=null;
-  if(hist.length){
+  let note=crossNote;
+  if(hist.length && !note){
     const modThen=sessionMod(hist[0].ss);
     if(rail==="high") note="held back by your estimated 1RM";
     else if(rail==="low") note="propped up by your estimated 1RM";
@@ -875,6 +898,8 @@ function waveChart(pts, o){
     ? '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="4.5" fill="#201d1a" stroke="'+col+'" stroke-width="2"/>'
     : '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.2" fill="'+col+'"/>';
   const dA=fmtD(minT), dB=fmtD(maxT);
+  // Compare rendered dates, not raw timestamps: a run that straddles midnight is two
+  // calendar days and should show both, even though it is only hours wide.
   if(dA===dB){
     // every point landed on one day: two identical end labels are noise
     g+='<text x="'+((PL+W-PR)/2).toFixed(1)+'" y="'+(H-6)+'" fill="#8d8271" font-size="9" text-anchor="middle" font-family="ui-monospace,monospace">'+
@@ -1265,6 +1290,13 @@ function dataView(){
     '<button class="btn btn-ghost btn-sm grow" onclick="document.getElementById(\'importFile\').click()">Import file</button>'+
     '<input type="file" id="importFile" accept="application/json" style="display:none" onchange="app.importBackup(this)"></div></div>';
 
+  h+='<div class="card"><div class="eyebrow">Version</div>'+
+    '<div class="row between"><span style="color:var(--dim);font-size:13px">Running</span>'+
+    '<span class="mono" style="color:var(--amber);font-size:18px;font-weight:700">v'+APP_VERSION+'</span></div>'+
+    '<div class="row between" style="margin-top:6px"><span style="color:var(--dim);font-size:13px">Built</span>'+
+    '<span class="mono" style="color:var(--faint);font-size:13px">'+APP_BUILT+'</span></div>'+
+    '<p class="hint">If this does not match the version you just uploaded, open the app once more with internet: the service worker serves the cached copy first and installs the new one behind it. Still stale after two launches? Remove it from the home screen and re-add from Safari.</p></div>';
+
   h+='<div class="card"><div class="eyebrow">Danger zone</div>'+
     '<button class="btn btn-ghost btn-sm" onclick="app.reset()">Erase everything on this device</button></div>';
   return h;
@@ -1272,6 +1304,8 @@ function dataView(){
 
 // ---------- render ----------
 function render(){
+  const vt=document.getElementById("verTag");
+  if(vt) vt.textContent="v"+APP_VERSION;   // header always matches the code
   const el=document.getElementById("app");
   el.innerHTML = ui.tab==="today"?todayView():ui.tab==="session"?sessionView():ui.tab==="progress"?progressView():dataView();
   document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("on", b.dataset.tab===ui.tab));
