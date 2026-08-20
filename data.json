@@ -176,11 +176,152 @@
      ]
     }
    ]
+  },
+  {
+   "id": 1787202301823,
+   "date": "2026-08-20T05:05:01.823Z",
+   "day": "B",
+   "rough": false,
+   "deload": false,
+   "intensity": 1,
+   "entries": [
+    {
+     "m": "legPress",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 429,
+       "reps": 8,
+       "rir": 2
+      },
+      {
+       "w": 429,
+       "reps": 8,
+       "rir": 2
+      },
+      {
+       "w": 429,
+       "reps": 8,
+       "rir": 2
+      },
+      {
+       "w": 429,
+       "reps": 8,
+       "rir": 2
+      }
+     ]
+    },
+    {
+     "m": "legCurl",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 106,
+       "reps": 10,
+       "rir": 2
+      },
+      {
+       "w": 106,
+       "reps": 10,
+       "rir": 2
+      },
+      {
+       "w": 106,
+       "reps": 10,
+       "rir": 2
+      }
+     ]
+    },
+    {
+     "m": "legExt",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 120,
+       "reps": 12,
+       "rir": 2
+      },
+      {
+       "w": 120,
+       "reps": 12,
+       "rir": 1
+      },
+      {
+       "w": 120,
+       "reps": 12,
+       "rir": 1
+      }
+     ]
+    },
+    {
+     "m": "hipThrust",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 155,
+       "reps": 8,
+       "rir": 4
+      },
+      {
+       "w": 155,
+       "reps": 8,
+       "rir": 4
+      },
+      {
+       "w": 155,
+       "reps": 8,
+       "rir": 4
+      }
+     ]
+    },
+    {
+     "m": "backExt",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 115,
+       "reps": 12,
+       "rir": 2
+      },
+      {
+       "w": 115,
+       "reps": 12,
+       "rir": 3
+      },
+      {
+       "w": 115,
+       "reps": 12,
+       "rir": 2
+      }
+     ]
+    },
+    {
+     "m": "rotaryTorso",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 55,
+       "reps": 12,
+       "rir": 1
+      },
+      {
+       "w": 55,
+       "reps": 12,
+       "rir": 2
+      },
+      {
+       "w": 55,
+       "reps": 12,
+       "rir": 2
+      }
+     ]
+    }
+   ]
   }
  ],
  "tests": [],
  "active": null,
- "updatedAt": "2026-08-20T04:30:20.940Z",
+ "updatedAt": "2026-08-20T05:05:04.326Z",
  "settings": {
   "mesoStart": "2026-08-17T00:43:43.043Z",
   "deload": false,
