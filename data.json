@@ -317,11 +317,188 @@
      ]
     }
    ]
+  },
+  {
+   "id": 1787719794882,
+   "date": "2026-08-26T04:49:54.882Z",
+   "day": "A",
+   "rough": false,
+   "deload": false,
+   "intensity": 1,
+   "entries": [
+    {
+     "m": "chestPress",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 185,
+       "reps": 6,
+       "rir": 2
+      },
+      {
+       "w": 185,
+       "reps": 7,
+       "rir": 2
+      },
+      {
+       "w": 185,
+       "reps": 8,
+       "rir": 2
+      },
+      {
+       "w": 185,
+       "reps": 8,
+       "rir": 2
+      }
+     ]
+    },
+    {
+     "m": "seatedRow",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 130,
+       "reps": 8,
+       "rir": 4
+      },
+      {
+       "w": 130,
+       "reps": 8,
+       "rir": 4
+      },
+      {
+       "w": 130,
+       "reps": 8,
+       "rir": 4
+      },
+      {
+       "w": 130,
+       "reps": 8,
+       "rir": 4
+      }
+     ]
+    },
+    {
+     "m": "shoulderPress",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 95,
+       "reps": 11,
+       "rir": 2
+      },
+      {
+       "w": 95,
+       "reps": 10,
+       "rir": 4
+      },
+      {
+       "w": 95,
+       "reps": 10,
+       "rir": 3
+      },
+      {
+       "w": 95,
+       "reps": 10,
+       "rir": 3
+      }
+     ]
+    },
+    {
+     "m": "crunch",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 115,
+       "reps": 10,
+       "rir": 2
+      },
+      {
+       "w": 115,
+       "reps": 10,
+       "rir": 2
+      },
+      {
+       "w": 115,
+       "reps": 8,
+       "rir": 0
+      }
+     ]
+    },
+    {
+     "m": "butterfly",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 80,
+       "reps": 10,
+       "rir": 2
+      },
+      {
+       "w": 80,
+       "reps": 6,
+       "rir": 0
+      },
+      {
+       "w": 80,
+       "reps": 5,
+       "rir": 0
+      }
+     ]
+    },
+    {
+     "m": "reverseFlys",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 30,
+       "reps": 12,
+       "rir": 2
+      },
+      {
+       "w": 30,
+       "reps": 12,
+       "rir": 2
+      },
+      {
+       "w": 30,
+       "reps": 12,
+       "rir": 2
+      },
+      {
+       "w": 30,
+       "reps": 12,
+       "rir": 2
+      }
+     ]
+    },
+    {
+     "m": "triceps",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 145,
+       "reps": 10,
+       "rir": 2
+      },
+      {
+       "w": 145,
+       "reps": 10,
+       "rir": 2
+      },
+      {
+       "w": 145,
+       "reps": 10,
+       "rir": 0
+      }
+     ]
+    }
+   ]
   }
  ],
  "tests": [],
  "active": null,
- "updatedAt": "2026-08-26T04:47:44.845Z",
+ "updatedAt": "2026-08-26T04:49:57.394Z",
  "settings": {
   "mesoStart": "2026-08-17T00:43:43.043Z",
   "deload": false,
