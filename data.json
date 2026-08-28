@@ -494,11 +494,136 @@
      ]
     }
    ]
+  },
+  {
+   "id": 1787890900424,
+   "date": "2026-08-28T04:21:40.424Z",
+   "day": "C",
+   "rough": false,
+   "deload": false,
+   "intensity": 1,
+   "entries": [
+    {
+     "m": "latPulldown",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 175,
+       "reps": 6,
+       "rir": 3
+      },
+      {
+       "w": 175,
+       "reps": 6,
+       "rir": 3
+      },
+      {
+       "w": 180,
+       "reps": 6,
+       "rir": 2
+      },
+      {
+       "w": 185,
+       "reps": 6,
+       "rir": 2
+      }
+     ]
+    },
+    {
+     "m": "seatedRow",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 135,
+       "reps": 8,
+       "rir": 2
+      },
+      {
+       "w": 135,
+       "reps": 8,
+       "rir": 2
+      },
+      {
+       "w": 135,
+       "reps": 8,
+       "rir": 2
+      }
+     ]
+    },
+    {
+     "m": "chestPress",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 190,
+       "reps": 6,
+       "rir": 2
+      },
+      {
+       "w": 190,
+       "reps": 6,
+       "rir": 2
+      },
+      {
+       "w": 190,
+       "reps": 6,
+       "rir": 2
+      }
+     ]
+    },
+    {
+     "m": "crunch",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 115,
+       "reps": 8,
+       "rir": 2
+      },
+      {
+       "w": 115,
+       "reps": 8,
+       "rir": 2
+      },
+      {
+       "w": 115,
+       "reps": 8,
+       "rir": 2
+      }
+     ]
+    },
+    {
+     "m": "bicepCurl",
+     "method": "Regular",
+     "sets": [
+      {
+       "w": 30,
+       "reps": 12,
+       "rir": 2
+      },
+      {
+       "w": 35,
+       "reps": 12,
+       "rir": 2
+      },
+      {
+       "w": 35,
+       "reps": 12,
+       "rir": 2
+      },
+      {
+       "w": 35,
+       "reps": 12,
+       "rir": 2
+      }
+     ]
+    }
+   ]
   }
  ],
  "tests": [],
  "active": null,
- "updatedAt": "2026-08-28T04:19:10.240Z",
+ "updatedAt": "2026-08-28T04:21:42.926Z",
  "settings": {
   "mesoStart": "2026-08-17T00:43:43.043Z",
   "deload": false,
