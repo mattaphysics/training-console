@@ -228,7 +228,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-
 // Goal: aesthetic hypertrophy on the Fred Fitness EGYM floor.
 // Units: pounds.
 // ============================================================
-const APP_VERSION = "4.4";
+const APP_VERSION = "4.5";
 const APP_BUILT = "2026-08-26";   // bump both whenever index.html changes
 const KEY = "egym-console-v1";
 const TOKEN_KEY = "egym-console-token";
@@ -335,6 +335,7 @@ const PROGRAM = {
     ex("crunch",3,10,20,{note:"Sits here on purpose: every machine before and after it is seated and back-supported, so core work costs nothing here and is the first thing cut if it sits last"}),
     ex("butterfly",3,10,15,{finisher:true,note:"Full stretch, no bounce"}),
     ex("reverseFlys",4,12,20,{note:"Posture work. The sets that show up in photos"}),
+    ex("bicepCurl",3,10,15,{finisher:true}),
     ex("triceps",3,10,15,{finisher:true}),
   ]},
   B:{title:"Lower A", sub:"Quads & core", key:["quads","glutes","obliques"], cardio:"Optional 15 min Zone 2 to finish",
@@ -384,6 +385,7 @@ const PROGRAM = {
     ex("shoulderPress",4,8,12),
     ex("reverseFlys",4,12,20,{note:"Posture work. The sets that show up in photos"}),
     ex("butterfly",3,10,15,{finisher:true,note:"Full stretch, no bounce"}),
+    ex("bicepCurl",3,10,15,{finisher:true}),
     ex("triceps",3,10,15,{finisher:true}),
     ex("crunch",5,10,20),
     ex("rotaryTorso",3,12,20,{note:"Alternate sides, controlled"}),
@@ -405,7 +407,7 @@ const PROGRAM = {
   ]},
 };
 // What one full 4x week delivers, in fractional sets — the reference the volume bars read against.
-const TARGETS = {chest:10,delts:7.5,triceps:11.5,lats:7.5,upperBack:12.5,rearDelts:10.5,biceps:9.5,
+const TARGETS = {chest:10,delts:7.5,triceps:11.5,lats:7.5,upperBack:12.5,rearDelts:10.5,biceps:12.5,
   abs:9,obliques:6,lowerBack:6,quads:10,hamstrings:13,glutes:17};
 // Which sessions run, and in what order, for each weekly schedule.
 const SCHEDULES = { 2:["R1","R2"], 3:["A","L","C"], 4:["A","B","C","D"] };

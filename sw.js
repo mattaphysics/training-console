@@ -1,7 +1,7 @@
 // Training Console service worker
 // Cache-first with background refresh: instant offline loads,
 // and any update you push to the repo arrives on the next launch after one online open.
-const CACHE = "egym-console-v18";
+const CACHE = "egym-console-v19";
 const ASSETS = [
   "./",
   "./index.html",
