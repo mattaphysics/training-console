@@ -180,7 +180,7 @@ body{color:var(--cream);font-family:var(--sans);max-width:540px;margin:0 auto;
 
 /* nav */
 .nav{position:fixed;bottom:0;left:0;right:0;max-width:540px;margin:0 auto;display:flex;z-index:20;
-  background:rgba(42,38,34,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);
+  background:rgba(42,38,34,1);border-top:1px solid var(--line);
   padding-bottom:env(safe-area-inset-bottom);}
 .nav button{flex:1;padding:13px 0 15px;background:none;border:none;color:var(--faint);
   font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;min-height:56px;}
@@ -189,7 +189,7 @@ body{color:var(--cream);font-family:var(--sans);max-width:540px;margin:0 auto;
 /* rest clock: fixed above the nav, owned imperatively so re-renders never disturb it */
 .restbar{position:fixed;bottom:calc(56px + env(safe-area-inset-bottom));left:0;right:0;max-width:540px;
   margin:0 auto;z-index:19;display:none;align-items:center;gap:12px;padding:11px 14px;
-  background:rgba(42,38,34,.97);backdrop-filter:blur(12px);border-top:1px solid var(--line);}
+  background:rgba(42,38,34,1);border-top:1px solid var(--line);}
 .restbar.on{display:flex;}
 .restbar.done{border-top-color:var(--green);}
 .rest-time{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--amber);min-width:62px;}
@@ -228,8 +228,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-
 // Goal: aesthetic hypertrophy on the Fred Fitness EGYM floor.
 // Units: pounds.
 // ============================================================
-const APP_VERSION = "4.1";
-const APP_BUILT = "2026-08-16";   // bump both whenever index.html changes
+const APP_VERSION = "4.4";
+const APP_BUILT = "2026-08-26";   // bump both whenever index.html changes
 const KEY = "egym-console-v1";
 const TOKEN_KEY = "egym-console-token";
 const ROUND_LB = 5, HOUR = 3600000;
@@ -320,12 +320,14 @@ const restFor = m => (m==="crunch"||m==="rotaryTorso") ? 90
 const ex = (m,sets,lo,hi,o) => Object.assign({m,sets,lo,hi,pct:pctFor(lo,hi),rest:restFor(m)}, o||{});
 const exF = (m,sets,o) => Object.assign({m,sets,lo:0,hi:0,pct:pctFor(12,15),adaptive:true,rest:restFor(m)}, o||{});
 
-// Push / Pull / Legs. Frequency has no consistent effect on hypertrophy in the
-// current meta-analytic evidence, so each muscle gets one hard, coherent day
-// rather than being smeared across three.
+// Frequency has no consistent effect on hypertrophy in the current meta-analytic
+// evidence, so each muscle gets one hard, coherent exposure per session rather than
+// being smeared thin. Sessions are content-named, not day-named: the schedule setting
+// (2, 3 or 4 per week) picks which of these run and in what rotation, so the program
+// stays coherent whatever the week looks like.
 const PROGRAM = {
-  A:{title:"Upper A", sub:"Chest lean", dow:"Mon",
-     key:["chest","delts","triceps"], cardio:"Optional 15 min Zone 2 to finish",
+  // --- four-day upper/lower split (4x weeks) ---
+  A:{title:"Upper A", sub:"Chest lean", key:["chest","delts","triceps"], cardio:"Optional 15 min Zone 2 to finish",
      items:[
     ex("chestPress",4,6,10,{anchor:true}),
     ex("seatedRow",4,8,12,{note:"One second squeeze at the ribs"}),
@@ -335,8 +337,7 @@ const PROGRAM = {
     ex("reverseFlys",4,12,20,{note:"Posture work. The sets that show up in photos"}),
     ex("triceps",3,10,15,{finisher:true}),
   ]},
-  B:{title:"Lower A", sub:"Quads and core", dow:"Tue",
-     key:["quads","glutes","obliques"], cardio:"Optional 15 min Zone 2 to finish",
+  B:{title:"Lower A", sub:"Quads & core", key:["quads","glutes","obliques"], cardio:"Optional 15 min Zone 2 to finish",
      items:[
     ex("legPress",4,8,12,{anchor:true}),
     ex("legCurl",3,10,15),
@@ -345,8 +346,7 @@ const PROGRAM = {
     ex("backExt",3,12,20,{note:"Slow, no hyperextension at the top"}),
     ex("rotaryTorso",3,12,20,{note:"Alternate sides, controlled"}),
   ]},
-  C:{title:"Upper B", sub:"Back and arms", dow:"Thu",
-     key:["lats","upperBack","biceps"], cardio:"Optional 15 min Zone 2 to finish",
+  C:{title:"Upper B", sub:"Back & arms", key:["lats","upperBack","biceps"], cardio:"Optional 15 min Zone 2 to finish",
      items:[
     ex("latPulldown",4,6,10,{anchor:true}),
     ex("seatedRow",3,10,15),
@@ -356,8 +356,7 @@ const PROGRAM = {
     ex("reverseFlys",3,12,20),
     ex("triceps",3,10,15,{finisher:true}),
   ]},
-  D:{title:"Lower B", sub:"Glutes and core", dow:"Fri",
-     key:["glutes","hamstrings","abs"], cardio:"Optional intervals: 6 x (1 min hard / 2 min easy)",
+  D:{title:"Lower B", sub:"Glutes & core", key:["glutes","hamstrings","abs"], cardio:"Optional intervals: 6 x (1 min hard / 2 min easy)",
      items:[
     ex("hipThrust",4,8,12,{anchor:true}),
     ex("legCurl",3,10,15),
@@ -366,13 +365,52 @@ const PROGRAM = {
     ex("crunch",3,10,20),
     ex("rotaryTorso",3,12,20),
   ]},
+  // --- consolidated leg day: the single lower session on 3x weeks ---
+  L:{title:"Lower", sub:"Legs & core", key:["quads","glutes","hamstrings"], cardio:"Optional 15 min Zone 2 to finish",
+     items:[
+    ex("legPress",4,8,12,{anchor:true}),
+    ex("legCurl",3,10,15),
+    ex("hipThrust",3,8,12),
+    ex("backExt",3,12,20,{note:"Slow, no hyperextension at the top"}),
+    ex("rotaryTorso",3,12,20,{note:"Alternate sides, controlled"}),
+    ex("crunch",3,10,20),
+  ]},
+  // --- reduced-schedule sessions (2x weeks): a full week of upper + core across two
+  // --- long days, with a maintenance dose of legs at the end of each ---
+  R1:{title:"Full A", sub:"Upper \u00b7 core \u00b7 legs", key:["chest","delts","triceps"], cardio:"Skip cardio here \u2014 this one runs long",
+     items:[
+    ex("chestPress",4,6,10,{anchor:true}),
+    ex("seatedRow",4,8,12,{note:"One second squeeze at the ribs"}),
+    ex("shoulderPress",4,8,12),
+    ex("reverseFlys",4,12,20,{note:"Posture work. The sets that show up in photos"}),
+    ex("butterfly",3,10,15,{finisher:true,note:"Full stretch, no bounce"}),
+    ex("triceps",3,10,15,{finisher:true}),
+    ex("crunch",5,10,20),
+    ex("rotaryTorso",3,12,20,{note:"Alternate sides, controlled"}),
+    ex("backExt",3,12,20,{note:"Slow, no hyperextension at the top"}),
+    ex("legPress",3,10,15,{note:"Maintenance dose. Keep it heavy; first thing to drop if you are short on time"}),
+  ]},
+  R2:{title:"Full B", sub:"Upper \u00b7 core \u00b7 legs", key:["lats","upperBack","biceps"], cardio:"Skip cardio here \u2014 this one runs long",
+     items:[
+    ex("latPulldown",4,6,10,{anchor:true}),
+    ex("seatedRow",3,10,15),
+    ex("chestPress",3,8,12),
+    ex("bicepCurl",4,10,15,{finisher:true}),
+    ex("reverseFlys",3,12,20),
+    ex("triceps",3,10,15,{finisher:true}),
+    ex("crunch",4,10,20),
+    ex("rotaryTorso",3,12,20,{note:"Alternate sides, controlled"}),
+    ex("backExt",3,12,20,{note:"Slow, no hyperextension at the top"}),
+    ex("legPress",3,10,15,{note:"Maintenance dose. Keep it heavy; first thing to drop if you are short on time"}),
+  ]},
 };
-// What one full A+B+C week delivers in fractional sets.
-// What one full Mon/Tue/Thu/Fri week delivers, in fractional sets.
+// What one full 4x week delivers, in fractional sets — the reference the volume bars read against.
 const TARGETS = {chest:10,delts:7.5,triceps:11.5,lats:7.5,upperBack:12.5,rearDelts:10.5,biceps:9.5,
   abs:9,obliques:6,lowerBack:6,quads:10,hamstrings:13,glutes:17};
-const ORDER = ["A","B","C","D"];
-const WEEK_TARGET = 4;
+// Which sessions run, and in what order, for each weekly schedule.
+const SCHEDULES = { 2:["R1","R2"], 3:["A","L","C"], 4:["A","B","C","D"] };
+function orderFor(s){ const n=(s&&s.settings&&s.settings.schedule)||3; return SCHEDULES[n]||SCHEDULES[3]; }
+function weekTarget(s){ return (s&&s.settings&&s.settings.schedule)||3; }
 
 // ---------- e1RM ----------
 const clamp01 = x => Math.max(0, Math.min(1, x));
@@ -413,12 +451,14 @@ function rollingE1RM(s, mId){
 
 // ---------- method selection ----------
 const BLOCK_WEEKS = 6;
-function mesoWeek(s, now){
-  const start=new Date(s.settings.mesoStart).getTime();
-  if(!isFinite(start)) return 1;
-  const raw=Math.floor(((now||Date.now())-start)/(168*HOUR))+1;
-  if(raw<1) return 1;                       // start date sitting in the future
-  return ((raw-1)%BLOCK_WEEKS)+1;           // six week block that repeats forever
+const SESSIONS_PER_BLOCK_WEEK = 3;          // a block-week is this many sessions
+function mesoWeek(s){
+  // Session-based, not calendar-based: the block advances with training done, so an
+  // irregular week-to-week schedule never marches the phase forward on its own.
+  const anchor=(s.settings&&s.settings.blockAnchorCount)||0;
+  const done=Math.max(0,(s.sessions?s.sessions.length:0)-anchor);
+  const raw=Math.floor(done/SESSIONS_PER_BLOCK_WEEK)+1;
+  return ((raw-1)%BLOCK_WEEKS)+1;           // six-phase block that repeats forever
 }
 // Negative is fatiguing and does not out-build regular sets, so it appears on the
 // single anchor compound of a day and only once you are mid-block.
@@ -454,16 +494,22 @@ function gradeEntry(e, item){
   }
   if(!full) return {adj:1.0,step:0,why:"sets missing — repeat this weight"};
 
-  // Prescribed reps completed, so the weight goes up. How far is set by everything you
-  // had spare: reps above the bottom of the range, plus reps still in the tank. Continuous,
-  // so there is no cliff between 11 reps and 12.
+  // Prescribed reps completed, so the weight goes up. How far is set by two things you had
+  // spare: how deep into the rep range you landed, and how many reps stayed in the tank.
+  // Position uses the AVERAGE rep across sets (not the worst one), so topping the range on
+  // most sets reads as topping the range even if a set lagged. Topping the range with
+  // reserve is a much bigger rise than scraping its bottom with the same reserve — the two
+  // are no longer close. Continuous, so there is no cliff between 11 reps and 12.
   const span=Math.max(1,item.hi-item.lo);
-  const pos=(minReps-item.lo)/span;
-  const credit=Math.min(6, pos*2 + avgRir);
+  const avgReps=reps.reduce((a,b)=>a+b,0)/reps.length;
+  const pos=clamp01((avgReps-item.lo)/span);
+  const credit=Math.min(7, pos*3.5 + avgRir);
   const rirTxt=avgRir>=0.5?Math.round(avgRir)+" in reserve":"at failure";
-  const why=(minReps>=item.hi?"top of the range":minReps+" reps")+", "+rirTxt;
+  const maxReps=Math.max(...reps);
+  const repShown=maxReps===minReps?String(minReps):minReps+"\u2013"+maxReps;
+  const why=(pos>=0.85?"top of the range":repShown+" reps")+", "+rirTxt;
   // Below ~2 credits the rise is smaller than one plate; let rounding decide rather than
-  // forcing a 5 lb jump that would be a huge relative step on a light machine.
+  // forcing a jump that would be a huge relative step on a light machine.
   return {adj:1+credit*0.0125, step:credit>=2?1:0, why};
 }
 // Sessions written by older versions may carry no intensity. Falling back to 1 there
@@ -559,10 +605,10 @@ function prescribe(s, item, dayId, opts){
     const r=cur.e.sets.map(x=>x.reps);
     const fromDay=PROGRAM[cur.ss.day];
     lastTxt=cur.e.sets.length+"x"+Math.min(...r)+"-"+Math.max(...r)+" @ "+lastW+" lb"+
-      (cur.sameDay?"":" ("+(fromDay?fromDay.dow:cur.ss.day)+")");
+      (cur.sameDay?"":" ("+(fromDay?fromDay.title:cur.ss.day)+")");
     lastReps=Math.min(...r);
     if(!cur.sameDay && Math.abs(scale-1)>0.01)
-      crossNote="carried over from "+(fromDay?fromDay.dow:cur.ss.day)+" and adjusted for this rep range";
+      crossNote="carried over from "+(fromDay?fromDay.title:cur.ss.day)+" and adjusted for this rep range";
   }
   const anchor=roll.v*item.pct;
   const railLo=anchor*0.70, railHi=anchor*1.45;
@@ -576,6 +622,16 @@ function prescribe(s, item, dayId, opts){
     const floorW=roundLb(lastW*mod/sessionMod(hist[0].ss));
     if(step>0&&w<=floorW) w=floorW+ROUND_LB;
     if(step<0&&w>=floorW) w=Math.max(ROUND_LB,floorW-ROUND_LB);
+  }
+  // Pooling is per machine, but a lighter, higher-rep day must never be prescribed above
+  // the heavier day it drew from. Translating the weight across ranges can carry it over,
+  // and this day's own grade can lift it, but not past what the heavier day actually put up.
+  if(hist.length && !hist[0].sameDay && lastW!=null){
+    const src=itemFor(hist[0].ss.day,item.m);
+    if(src && src.pct>item.pct){
+      const cap=roundLb(lastW*mod/sessionMod(hist[0].ss));
+      if(w>cap){ w=cap; crossNote="held to the heavier day's weight"; }
+    }
   }
   // The prescribed weight is shaped by more than the grade: the intensity setting, the
   // e1RM rails and 5 lb rounding all land after it. Say so, rather than reporting the
@@ -631,8 +687,9 @@ function groupReadiness(rec, g){
 const pace7 = (s, now=Date.now()) => s.sessions.filter(ss=>now-new Date(ss.date).getTime()<=168*HOUR).length;
 
 function recommend(s, now=Date.now()){
-  const abc=s.sessions.filter(ss=>ORDER.includes(ss.day));
-  const next=abc.length?ORDER[(ORDER.indexOf(abc[abc.length-1].day)+1)%ORDER.length]:"A";
+  const ORD=orderFor(s);
+  const abc=s.sessions.filter(ss=>ORD.includes(ss.day));
+  const next=abc.length?ORD[(ORD.indexOf(abc[abc.length-1].day)+1)%ORD.length]:ORD[0];
   const recNow=fatigueMap(s,0,now), rec24=fatigueMap(s,24,now);
   const kr=r=>Math.min(...PROGRAM[next].key.map(k=>r[k]));
   const rNow=kr(recNow), r24=kr(rec24);
@@ -640,9 +697,9 @@ function recommend(s, now=Date.now()){
   const lastAny=s.sessions.length?new Date(s.sessions[s.sessions.length-1].date).getTime():0;
   const hSince=lastAny?(now-lastAny)/HOUR:999;
   let act, why;
-  if(!s.sessions.length){ act="go"; why="Nothing logged yet. Start with Push and the console calibrates from what you lift."; }
+  if(!s.sessions.length){ act="go"; why="Nothing logged yet. Start with "+(PROGRAM[next]?PROGRAM[next].title:"the first session")+" and the console calibrates from what you lift."; }
   else if(rNow>=0.65){ act="go"; why=PROGRAM[next].title+" muscles have recovered."; }
-  else if(pace<WEEK_TARGET&&hSince>=20){ act="pace"; why="Not fully recovered, but four sessions inside Mon to Fri means training a little tired. That is the trade."; }
+  else if(pace<weekTarget(s)&&hSince>=20){ act="pace"; why="Not fully recovered, but training a little tired keeps you on pace for the week. That is the trade."; }
   else { act="rest"; why="Still carrying fatigue. Tomorrow projects "+Math.round(r24*100)+"%."; }
   return {next,act,why,rNow,r24,pace,recNow};
 }
@@ -666,9 +723,13 @@ const store = {
   save(s){ try{ localStorage.setItem(KEY, JSON.stringify(s)); }catch(e){ this.ok=false; } },
 };
 const DEFAULT_STATE = {sessions:[],tests:[],active:null,updatedAt:null,
-  settings:{mesoStart:new Date().toISOString(), deload:false, intensity:INTENSITY_DEFAULT, eccPct:ECC_PCT_DEFAULT}};
+  settings:{mesoStart:new Date().toISOString(), deload:false, intensity:INTENSITY_DEFAULT, eccPct:ECC_PCT_DEFAULT, schedule:3, blockAnchorCount:null}};
 let state = Object.assign({}, DEFAULT_STATE, store.load()||{});
 state.settings = Object.assign({}, DEFAULT_STATE.settings, state.settings||{});
+// One-time: anchor the training block to the sessions already logged, so moving to
+// session-based counting starts a fresh block here rather than jumping mid-phase.
+if(state.settings.blockAnchorCount==null) state.settings.blockAnchorCount=(state.sessions||[]).length;
+if([2,3,4].indexOf(state.settings.schedule)<0) state.settings.schedule=3;
 // 0.92 was only ever an unannounced default, never something anyone chose. Clear it once
 // and record the fact, so a deliberate 92% later is left alone.
 if(!state.settings.intensitySet && Math.abs((state.settings.intensity||1)-0.92)<1e-6){
@@ -989,14 +1050,14 @@ function todayView(){
     '<div class="readybar"><span class="ready-num '+textClass(rec.rNow)+'">'+Math.round(rec.rNow*100)+'<span class="rx-u">%</span></span>'+
     '<span class="ready-meta">recovery in the muscles<br>'+esc(day.title)+' asks for</span></div>'+
     '<div class="stats"><span>Tomorrow<b>'+Math.round(rec.r24*100)+'%</b></span>'+
-    '<span>This week<b>'+rec.pace+' / '+WEEK_TARGET+'</b></span>'+
+    '<span>This week<b>'+rec.pace+' / '+weekTarget(state)+'</b></span>'+
     (Math.abs((state.settings.intensity||1)-1)>0.005
       ? '<span>Intensity<b class="t-amber">'+Math.round((state.settings.intensity||1)*100)+'%</b></span>' : '')+
     '<span>Block week<b>'+mesoWeek(state)+' / '+BLOCK_WEEKS+'</b></span></div>'+
-    '<div class="actions"><button class="btn btn-amber grow" onclick="app.start(\''+rec.next+'\')">Start '+esc(day.title)+' · '+esc(day.dow)+'</button></div>'+
+    '<div class="actions"><button class="btn btn-amber grow" onclick="app.start(\''+rec.next+'\')">Start '+esc(day.title)+'</button></div>'+
     '<div class="actions" style="margin-top:9px">'+
-    ORDER.filter(d=>d!==rec.next).map(d=>'<button class="btn btn-ghost btn-sm grow" onclick="app.start(\''+d+'\')">'+
-      esc(PROGRAM[d].dow)+'</button>').join('')+'</div>'+
+    orderFor(state).filter(d=>d!==rec.next).map(d=>'<button class="btn btn-ghost btn-sm grow" onclick="app.start(\''+d+'\')">'+
+      esc(PROGRAM[d].title)+'</button>').join('')+'</div>'+
     '<label class="toggle"><input type="checkbox" '+(ui.rough?'checked':'')+' onchange="app.rough(this.checked)">'+
     '<span>Rough day. Anchor lift switches to Isokinetic, one set trimmed, load eased 5%.</span></label></div>';
 
@@ -1022,7 +1083,7 @@ function todayView(){
   h+='</div>';
 
   const ctx=ctxOf(state,null);
-  h+='<div class="card"><div class="eyebrow">'+esc(day.title)+' · '+esc(day.sub)+' · usually '+esc(day.dow)+'</div>';
+  h+='<div class="card"><div class="eyebrow">'+esc(day.title)+' · '+esc(day.sub)+'</div>';
   day.items.forEach((it,i)=>{
     const meth=resolveMethod(it,ctx);
     h+='<div class="sprow" style="cursor:default"><span class="sp-name on">'+esc(MACHINES[it.m].name)+'</span>'+
@@ -1183,7 +1244,7 @@ function progressView(){
         '<span class="vol-track"><span class="vol-fill '+(p>=1?"f-green":p>=0.5?"f-amber":"f-dim")+'" style="width:'+Math.max(4,p*100)+'%"></span></span>'+
         '<span class="vol-num">'+(Math.round(v*10)/10)+'/'+t+'</span></div>';
     }
-    h+='<p class="hint">Indirect work counts as half a set, which is the counting method the volume research supports best. Targets equal one full Push + Pull + Legs week, so a complete week fills every bar. The bonus day pushes chest, arms, rear delts and abs above target on purpose.</p></div>';
+    h+='<p class="hint">Indirect work counts as half a set \u2014 the counting method the volume research supports best. The targets are one full 4\u00d7 week, so a 4\u00d7 week fills every bar. On 3\u00d7 and 2\u00d7 weeks the upper and ab bars still fill; legs (and on 3\u00d7 the oblique and lower-back bars) sit lower on purpose \u2014 that is the volume you trade away by training less.</p></div>';
     return h;
   }
 
@@ -1261,13 +1322,25 @@ function dataView(){
     '<input type="range" class="slider" min="80" max="105" step="5" value="'+eccPct+'" oninput="app.eccPreview(this.value)" onchange="app.ecc(this.value)" aria-label="Negative load as percent of one rep max">'+
     '<p class="hint">Research sets eccentric load as a share of your 1RM, not as a flat percentage above the lifting weight. Eccentric muscle activity only rises measurably past roughly 80%; beyond about 110% it starts eating into the lifting phase. 90% sits in the useful band whatever the rep range. Type a different split on the machine and the app follows yours instead.</p></div>';
 
+  const sched=state.settings.schedule||3;
+  const SCHED_NOTE={
+    2:"Reduced week. Two long sessions that keep your full upper and core volume and add a maintenance dose of legs. Priorities go first, leg press last \u2014 drop it if you are short on time.",
+    3:"Default. Two upper days and one leg day: full chest, arm, posture and ab volume; legs and the oblique / lower-back work run lighter.",
+    4:"Extra week. The full four-day upper/lower split \u2014 everything at full volume, legs included."
+  };
+  h+='<div class="card"><div class="eyebrow">Weekly schedule</div>'+
+    '<div class="row wrap" style="gap:8px">'+
+    [2,3,4].map(n=>'<button class="btn '+(sched===n?'btn-amber':'btn-ghost')+' btn-sm grow" onclick="app.schedule('+n+')">'+n+'\u00d7 / week</button>').join('')+
+    '</div>'+
+    '<p class="hint">'+SCHED_NOTE[sched]+'</p></div>';
+
   h+='<div class="card"><div class="eyebrow">Training block</div>'+
     '<div class="row between wrap"><span style="color:var(--dim);font-size:13px">Week <b class="mono" style="color:var(--cream);font-size:16px">'+wk+'</b> of '+BLOCK_WEEKS+'</span>'+
     '<button class="btn btn-ghost btn-sm" onclick="app.newMeso()">Start new block</button></div>'+
-    '<p class="hint">Weeks 1-2 all Regular. Weeks 3-5 the anchor lift of each day runs Negative. Week 6 is the deload, then it cycles.</p>'+
+    '<p class="hint">Weeks 1-2 all Regular. Weeks 3-5 the anchor lift runs Negative. Week 6 is the deload, then it cycles. A block-week is '+SESSIONS_PER_BLOCK_WEEK+' sessions, so the block tracks what you actually train \u2014 not the calendar.</p>'+
     '<label class="toggle"><input type="checkbox" '+(state.settings.deload?'checked':'')+' onchange="app.deload(this.checked)">'+
     '<span>Deload: half the sets, load eased 15%, anchors run Isokinetic.</span></label>'+
-    (wk>=BLOCK_WEEKS&&!state.settings.deload?'<div class="warn" style="margin-top:12px">Deload week. Switch deload on; the block restarts by itself next week.</div>':'')+'</div>';
+    (wk>=BLOCK_WEEKS&&!state.settings.deload?'<div class="warn" style="margin-top:12px">Deload phase. Switch deload on; the block restarts after the next few sessions.</div>':'')+'</div>';
 
   h+='<div class="card"><div class="eyebrow" onclick="app.methods()" style="cursor:pointer">Why each method is where it is '+(ui.showMethods?"▾":"▸")+'</div>';
   if(ui.showMethods){
@@ -1391,7 +1464,8 @@ window.app = {
     mutate(s=>({...s, tests:[...s.tests,{id:Date.now(),date:new Date().toISOString(),m:ui.testM,lb:v}]}));
   },
   deload(v){ mutate(s=>({...s, settings:{...s.settings, deload:v}})); },
-  newMeso(){ mutate(s=>({...s, settings:{...s.settings, mesoStart:new Date().toISOString(), deload:false}})); },
+  schedule(n){ if([2,3,4].indexOf(n)<0) return; mutate(s=>({...s, settings:{...s.settings, schedule:n}})); },
+  newMeso(){ mutate(s=>({...s, settings:{...s.settings, blockAnchorCount:(s.sessions||[]).length, deload:false}})); },
   saveSync(){
     const owner=(document.getElementById("cfgOwner").value||"").trim();
     const repo=(document.getElementById("cfgRepo").value||"").trim();
@@ -1428,7 +1502,7 @@ window.app = {
   reset(){
     if(confirm("Erase all sessions, tests and settings from this device?")){
       mutate(()=>({...DEFAULT_STATE, settings:{mesoStart:new Date().toISOString(), deload:false,
-        intensity:INTENSITY_DEFAULT, eccPct:ECC_PCT_DEFAULT}}));
+        intensity:INTENSITY_DEFAULT, eccPct:ECC_PCT_DEFAULT, schedule:3, blockAnchorCount:0}}));
     }
   },
 };
